@@ -21,11 +21,11 @@ app.use(express.static('dist'))
 // the phonebook has and date
 app.get('/info', (request, response) => {
     date = new Date()
-    response.send(
-        `Phonebook has info for ${persons.length} people
-        <br>
-        ${date}`
-    )
+    Person.find({}).then(persons => {
+        response.send(
+            `Phonebook has info for ${persons.length} people<br>${date}`
+        )
+    }) 
 })
 
 // get all data on persons
@@ -35,16 +35,16 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-// functionality for displaying the information for a single phonebook entry. 
+// display a single phonebook entry. 
 app.get('/api/persons/:id', (request, response, next) => {
-    Person.findById(request.params.id).then(person => {
-        if (person) {
-            response.json(person)
-        } else {
-            response.status(404).end()
-        }
-    })
-    .catch(error => next(error))
+  Person.findById(request.params.id).then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
+  })
+  .catch(error => next(error))
 })
 
 
