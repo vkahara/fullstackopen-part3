@@ -55,45 +55,30 @@ app.delete('/api/persons/:id', (request, response) => {
     response.status(204).end()
 })
 
-
-// generate new id that is 1 larger
-//than the previous largest id
-const generateId = () => {
-    const randomId = Math.floor(Math.random() * 10000000)
-    return randomId
-  }
-
 // add new phonebook entry. 
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    //check for duplicate name
-    if (persons.some((person) => person.name === body.name)) {
-        return response.status(409).json({
-            error: 'name must be unique'
-        })
-    }
-
     // check if information missing
-    if (!body.name) {
+    if (body.name === undefined) {
         return response.status(400).json({
             error: 'name is missing'
         })
     }
-    if (!body.number) {
+    if (body.number === undefined) {
         return response.status(400).json({
             error: 'number is missing'
         })
     }
     
-    const person = {
-        id: generateId(),
+    const person = new Person({
         name: body.name,
         number: body.number,
-    }
+    })
 
-    persons = persons.concat(person)
-    response.json(person)
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
 const PORT = process.env.PORT
